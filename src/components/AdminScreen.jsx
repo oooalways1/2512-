@@ -1,14 +1,32 @@
 import { useState, useEffect } from 'react'
 import { getLearningData } from '../lib/supabase'
 
+const ADMIN_PASSWORD = '1234'
+
 function AdminScreen({ onBack }) {
+  const [isAuthenticated, setIsAuthenticated] = useState(false)
+  const [password, setPassword] = useState('')
+  const [passwordError, setPasswordError] = useState('')
   const [records, setRecords] = useState([])
-  const [loading, setLoading] = useState(true)
+  const [loading, setLoading] = useState(false)
   const [selectedRecord, setSelectedRecord] = useState(null)
 
   useEffect(() => {
-    loadData()
-  }, [])
+    if (isAuthenticated) {
+      loadData()
+    }
+  }, [isAuthenticated])
+
+  const handlePasswordSubmit = (e) => {
+    e.preventDefault()
+    if (password === ADMIN_PASSWORD) {
+      setIsAuthenticated(true)
+      setPasswordError('')
+    } else {
+      setPasswordError('비밀번호가 올바르지 않습니다.')
+      setPassword('')
+    }
+  }
 
   const loadData = async () => {
     setLoading(true)
@@ -32,6 +50,49 @@ function AdminScreen({ onBack }) {
       hour: '2-digit',
       minute: '2-digit',
     })
+  }
+
+  // 비밀번호 입력 화면
+  if (!isAuthenticated) {
+    return (
+      <div className="text-center py-20">
+        <h2 className="text-4xl font-bold text-primary-blue mb-8">관리자 페이지</h2>
+        <div className="max-w-md mx-auto bg-gray-50 rounded-3xl p-8 shadow-lg">
+          <p className="text-xl text-gray-700 mb-6">비밀번호를 입력해주세요</p>
+          <form onSubmit={handlePasswordSubmit} className="space-y-4">
+            <input
+              type="password"
+              value={password}
+              onChange={(e) => {
+                setPassword(e.target.value)
+                setPasswordError('')
+              }}
+              placeholder="비밀번호 입력"
+              className="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:outline-none focus:border-primary-pink text-lg text-center"
+              autoFocus
+            />
+            {passwordError && (
+              <div className="text-red-600 font-bold">{passwordError}</div>
+            )}
+            <div className="flex gap-4">
+              <button
+                type="button"
+                onClick={onBack}
+                className="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-700 px-6 py-3 rounded-xl font-bold transition-colors"
+              >
+                취소
+              </button>
+              <button
+                type="submit"
+                className="flex-1 bg-gradient-to-r from-primary-blue to-blue-500 text-white px-6 py-3 rounded-xl font-bold hover:shadow-lg transition-all"
+              >
+                확인
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    )
   }
 
   if (loading) {
