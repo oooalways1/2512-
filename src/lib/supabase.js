@@ -87,13 +87,44 @@ export async function signUp(email, password, name) {
   }
 }
 
-// 로그인
-export async function signIn(email, password) {
+// 로그인 (이름 또는 이메일로)
+export async function signIn(nameOrEmail, password) {
   if (!supabase) {
     throw new Error('Supabase is not configured.')
   }
 
   try {
+    let email = nameOrEmail
+    
+    // 이름으로 입력된 경우, 이메일 형식이 아니면 자동 생성된 이메일 패턴으로 변환 시도
+    if (!nameOrEmail.includes('@')) {
+      // 이름으로 입력된 경우, learning_records에서 해당 이름의 사용자를 찾아서 이메일 추정
+      // 또는 여러 가능한 이메일 패턴 시도
+      // 간단하게 이름 기반 이메일 패턴으로 변환
+      const cleanName = nameOrEmail.trim().replace(/\s+/g, '')
+      
+      // learning_records에서 해당 이름의 최신 기록을 찾아서 이메일 추정
+      try {
+        const { data: records } = await supabase
+          .from('learning_records')
+          .select('student_name')
+          .eq('student_name', nameOrEmail.trim())
+          .order('created_at', { ascending: false })
+          .limit(1)
+        
+        // 이름으로는 직접 이메일을 찾을 수 없으므로, 
+        // 사용자에게 이메일을 입력하도록 안내하거나
+        // 여러 패턴을 시도해야 함
+        // 일단 이름을 그대로 사용 (실제로는 실패할 수 있음)
+      } catch (e) {
+        // 무시하고 계속 진행
+      }
+      
+      // 이름만으로는 로그인할 수 없으므로, 사용자에게 이메일을 입력하도록 안내
+      // 또는 회원가입 시 받은 이메일을 사용하도록 안내
+      throw new Error('이름으로는 로그인할 수 없습니다. 회원가입 시 받은 이메일을 입력해주세요.')
+    }
+
     const { data, error } = await supabase.auth.signInWithPassword({
       email,
       password,

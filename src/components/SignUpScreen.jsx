@@ -31,11 +31,27 @@ function SignUpScreen({ onSuccess, onSwitchToLogin }) {
 
     try {
       // 사용자명을 기반으로 자동 이메일 생성 (Supabase는 이메일이 필요)
-      const autoEmail = `${name.trim().replace(/\s+/g, '')}_${Date.now()}@temp.local`
-      await signUp(autoEmail, password, name)
-      setError('')
-      alert(`회원가입이 완료되었습니다!\n\n로그인 시 사용할 이메일: ${autoEmail}\n비밀번호: 입력하신 비밀번호\n\n이 정보를 기억해주세요!`)
-      onSuccess?.()
+      // 이름을 기반으로 간단한 이메일 생성 (타임스탬프 없이)
+      const cleanName = name.trim().replace(/\s+/g, '')
+      const autoEmail = `${cleanName}@temp.local`
+      
+      try {
+        await signUp(autoEmail, password, name)
+        setError('')
+        alert(`회원가입이 완료되었습니다!\n\n로그인 정보:\n이메일: ${autoEmail}\n비밀번호: 입력하신 비밀번호\n\n이 정보로 로그인하실 수 있습니다!`)
+        onSuccess?.()
+      } catch (err) {
+        // 이메일이 이미 존재하는 경우, 타임스탬프 추가해서 재시도
+        if (err.message && err.message.includes('already registered')) {
+          const uniqueEmail = `${cleanName}_${Date.now()}@temp.local`
+          await signUp(uniqueEmail, password, name)
+          setError('')
+          alert(`회원가입이 완료되었습니다!\n\n로그인 정보:\n이메일: ${uniqueEmail}\n비밀번호: 입력하신 비밀번호\n\n이 정보로 로그인하실 수 있습니다!`)
+          onSuccess?.()
+        } else {
+          throw err
+        }
+      }
     } catch (err) {
       setError(err.message || '회원가입에 실패했습니다.')
     } finally {

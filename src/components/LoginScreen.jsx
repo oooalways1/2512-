@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { signIn } from '../lib/supabase'
 
 function LoginScreen({ onSuccess, onSwitchToSignUp }) {
-  const [email, setEmail] = useState('')
+  const [name, setName] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
@@ -13,6 +13,15 @@ function LoginScreen({ onSuccess, onSwitchToSignUp }) {
     setLoading(true)
 
     try {
+      // 이름 또는 이메일로 입력 가능
+      let email = name
+      
+      if (!name.includes('@')) {
+        // 이름만 입력된 경우, 회원가입 시 생성된 이메일 형식으로 변환
+        const cleanName = name.trim().replace(/\s+/g, '')
+        email = `${cleanName}@temp.local`
+      }
+      
       await signIn(email, password)
       onSuccess?.()
     } catch (err) {
@@ -28,14 +37,14 @@ function LoginScreen({ onSuccess, onSwitchToSignUp }) {
       
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
-          <label className="block text-gray-700 font-bold mb-2">이메일</label>
+          <label className="block text-gray-700 font-bold mb-2">이름</label>
           <input
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            type="text"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
             required
             className="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:outline-none focus:border-primary-pink text-lg"
-            placeholder="이메일을 입력하세요"
+            placeholder="이름을 입력하세요"
           />
         </div>
 
