@@ -1,12 +1,20 @@
 import { createClient } from '@supabase/supabase-js'
 
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || ''
+const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || ''
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey)
+// 환경 변수가 있을 때만 Supabase client 생성
+export const supabase = supabaseUrl && supabaseAnonKey 
+  ? createClient(supabaseUrl, supabaseAnonKey)
+  : null
 
 // 학습 데이터 저장
 export async function saveLearningData(data) {
+  if (!supabase) {
+    console.warn('Supabase is not configured. Skipping data save.')
+    return null
+  }
+
   try {
     const { data: result, error } = await supabase
       .from('learning_records')
@@ -34,6 +42,11 @@ export async function saveLearningData(data) {
 
 // 학습 데이터 조회
 export async function getLearningData() {
+  if (!supabase) {
+    console.warn('Supabase is not configured. Returning empty array.')
+    return []
+  }
+
   try {
     const { data, error } = await supabase
       .from('learning_records')
