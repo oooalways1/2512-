@@ -62,3 +62,87 @@ export async function getLearningData() {
   }
 }
 
+// 회원가입
+export async function signUp(email, password, name) {
+  if (!supabase) {
+    throw new Error('Supabase is not configured.')
+  }
+
+  try {
+    const { data, error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        data: {
+          name: name || email.split('@')[0],
+        },
+      },
+    })
+
+    if (error) throw error
+    return data
+  } catch (error) {
+    console.error('Error signing up:', error)
+    throw error
+  }
+}
+
+// 로그인
+export async function signIn(email, password) {
+  if (!supabase) {
+    throw new Error('Supabase is not configured.')
+  }
+
+  try {
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    })
+
+    if (error) throw error
+    return data
+  } catch (error) {
+    console.error('Error signing in:', error)
+    throw error
+  }
+}
+
+// 로그아웃
+export async function signOut() {
+  if (!supabase) {
+    return
+  }
+
+  try {
+    const { error } = await supabase.auth.signOut()
+    if (error) throw error
+  } catch (error) {
+    console.error('Error signing out:', error)
+    throw error
+  }
+}
+
+// 현재 사용자 정보 가져오기
+export async function getCurrentUser() {
+  if (!supabase) {
+    return null
+  }
+
+  try {
+    const { data: { user } } = await supabase.auth.getUser()
+    return user
+  } catch (error) {
+    console.error('Error getting current user:', error)
+    return null
+  }
+}
+
+// Auth 상태 변경 리스너
+export function onAuthStateChange(callback) {
+  if (!supabase) {
+    return { data: { subscription: null } }
+  }
+
+  return supabase.auth.onAuthStateChange(callback)
+}
+

@@ -1,14 +1,18 @@
 import { useEffect } from 'react'
 import { saveLearningData } from '../lib/supabase'
+import { useAuth } from '../contexts/AuthContext'
 
 function ResultScreen({ gameData, onReview, onRestart }) {
+  const { user } = useAuth()
   const totalScore = Math.round(gameData.classifyScore * 0.5 + gameData.compareScore * 0.5)
 
   useEffect(() => {
     // 게임 데이터를 Supabase에 저장
     const saveData = async () => {
+      const studentName = user?.user_metadata?.name || user?.email?.split('@')[0] || '익명'
+      
       const dataToSave = {
-        studentName: '익명', // 나중에 학생 이름 입력 기능 추가 가능
+        studentName: studentName,
         classifyScore: Math.round(gameData.classifyScore),
         compareScore: Math.round(gameData.compareScore),
         totalScore: totalScore,
@@ -25,7 +29,7 @@ function ResultScreen({ gameData, onReview, onRestart }) {
     }
 
     saveData()
-  }, [])
+  }, [user])
 
   return (
     <div className="text-center">

@@ -30,13 +30,21 @@ VITE_SUPABASE_ANON_KEY=eyJhbGc...
 - URL과 Key 앞뒤에 따옴표 없이 입력하세요
 - 실제 값으로 교체하세요 (예시 값이 아닌 실제 값)
 
-## 4. 데이터베이스 테이블 생성
+## 4. Authentication (인증) 설정
+
+1. Supabase 대시보드에서 **Authentication** 메뉴 클릭
+2. **Providers** 탭에서 **Email** 활성화
+   - "Enable Email provider" 토글 ON
+   - "Confirm email" 옵션 설정 (테스트 시에는 OFF로 설정 가능)
+3. **Settings** 탭에서 필요한 설정 확인
+
+## 5. 데이터베이스 테이블 생성
 
 1. Supabase 대시보드에서 **SQL Editor** 메뉴 클릭
 2. `supabase_schema.sql` 파일의 내용을 복사하여 붙여넣기
 3. **RUN** 버튼 클릭하여 테이블 생성
 
-## 5. Vercel 배포 시 환경 변수 설정
+## 6. Vercel 배포 시 환경 변수 설정
 
 Vercel에서 배포할 때도 환경 변수를 설정해야 합니다:
 
@@ -47,6 +55,13 @@ Vercel에서 배포할 때도 환경 변수를 설정해야 합니다:
    - `VITE_SUPABASE_ANON_KEY`: Supabase anon key
 4. 각 환경(Production, Preview, Development)에 대해 설정
 5. 저장 후 재배포
+
+## 로그인/회원가입 기능
+
+이 프로젝트는 Supabase Authentication을 사용합니다:
+- 회원가입: 이메일, 비밀번호, 이름 입력
+- 로그인: 이메일, 비밀번호로 로그인
+- 로그인한 사용자의 게임 기록이 자동으로 저장됩니다
 
 ## 문제 해결
 

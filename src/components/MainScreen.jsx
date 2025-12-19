@@ -1,6 +1,83 @@
+import { useState } from 'react'
+import { useAuth } from '../contexts/AuthContext'
+import { signOut } from '../lib/supabase'
+import LoginScreen from './LoginScreen'
+import SignUpScreen from './SignUpScreen'
+
 function MainScreen({ onStart }) {
+  const { user } = useAuth()
+  const [showLogin, setShowLogin] = useState(false)
+  const [showSignUp, setShowSignUp] = useState(false)
+
+  const handleLogout = async () => {
+    try {
+      await signOut()
+    } catch (error) {
+      console.error('로그아웃 에러:', error)
+    }
+  }
+
+  if (showLogin) {
+    return (
+      <LoginScreen
+        onSuccess={() => setShowLogin(false)}
+        onSwitchToSignUp={() => {
+          setShowLogin(false)
+          setShowSignUp(true)
+        }}
+      />
+    )
+  }
+
+  if (showSignUp) {
+    return (
+      <SignUpScreen
+        onSuccess={() => {
+          setShowSignUp(false)
+          setShowLogin(true)
+        }}
+        onSwitchToLogin={() => {
+          setShowSignUp(false)
+          setShowLogin(true)
+        }}
+      />
+    )
+  }
+
   return (
     <div className="text-center">
+      {/* 로그인/로그아웃 버튼 */}
+      <div className="flex justify-end mb-4">
+        {user ? (
+          <div className="flex items-center gap-4">
+            <span className="text-gray-600 font-bold">
+              안녕하세요, {user.user_metadata?.name || user.email}님! 👋
+            </span>
+            <button
+              onClick={handleLogout}
+              className="bg-gray-200 hover:bg-gray-300 text-gray-700 px-4 py-2 rounded-full text-sm font-bold transition-colors"
+            >
+              로그아웃
+            </button>
+          </div>
+        ) : (
+          <div className="flex gap-2">
+            <button
+              onClick={() => setShowLogin(true)}
+              className="bg-primary-blue hover:bg-blue-600 text-white px-6 py-2 rounded-full text-sm font-bold transition-colors"
+            >
+              로그인
+            </button>
+            <button
+              onClick={() => setShowSignUp(true)}
+              className="bg-primary-pink hover:bg-pink-600 text-white px-6 py-2 rounded-full text-sm font-bold transition-colors"
+            >
+              회원가입
+            </button>
+          </div>
+        )}
+      </div>
+
       <div className="mb-8">
         {/* 분수 캐릭터 */}
         <div className="flex justify-center items-center mb-6">
