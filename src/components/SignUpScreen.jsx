@@ -3,7 +3,6 @@ import { signUp } from '../lib/supabase'
 
 function SignUpScreen({ onSuccess, onSwitchToLogin }) {
   const [name, setName] = useState('')
-  const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
   const [error, setError] = useState('')
@@ -12,6 +11,11 @@ function SignUpScreen({ onSuccess, onSwitchToLogin }) {
   const handleSubmit = async (e) => {
     e.preventDefault()
     setError('')
+
+    if (!name.trim()) {
+      setError('이름을 입력해주세요.')
+      return
+    }
 
     if (password !== confirmPassword) {
       setError('비밀번호가 일치하지 않습니다.')
@@ -26,9 +30,11 @@ function SignUpScreen({ onSuccess, onSwitchToLogin }) {
     setLoading(true)
 
     try {
-      await signUp(email, password, name)
+      // 사용자명을 기반으로 자동 이메일 생성 (Supabase는 이메일이 필요)
+      const autoEmail = `${name.trim().replace(/\s+/g, '')}_${Date.now()}@temp.local`
+      await signUp(autoEmail, password, name)
       setError('')
-      alert('회원가입이 완료되었습니다! 이메일을 확인해주세요. (테스트 환경에서는 바로 로그인 가능할 수 있습니다)')
+      alert(`회원가입이 완료되었습니다!\n\n로그인 시 사용할 이메일: ${autoEmail}\n비밀번호: 입력하신 비밀번호\n\n이 정보를 기억해주세요!`)
       onSuccess?.()
     } catch (err) {
       setError(err.message || '회원가입에 실패했습니다.')
@@ -51,18 +57,6 @@ function SignUpScreen({ onSuccess, onSwitchToLogin }) {
             required
             className="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:outline-none focus:border-primary-pink text-lg"
             placeholder="이름을 입력하세요"
-          />
-        </div>
-
-        <div>
-          <label className="block text-gray-700 font-bold mb-2">이메일</label>
-          <input
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-            className="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:outline-none focus:border-primary-pink text-lg"
-            placeholder="이메일을 입력하세요"
           />
         </div>
 
