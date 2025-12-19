@@ -4,7 +4,7 @@ import { signOut } from '../lib/supabase'
 import LoginScreen from './LoginScreen'
 import SignUpScreen from './SignUpScreen'
 
-function MainScreen({ onStart }) {
+function MainScreen({ onStart, onAdmin }) {
   const { user } = useAuth()
   const [showLogin, setShowLogin] = useState(false)
   const [showSignUp, setShowSignUp] = useState(false)
@@ -108,12 +108,31 @@ function MainScreen({ onStart }) {
         초등학교 3학년 분수 단원을 재미있게 배워봐요! 🎉
       </p>
       
-      <button
-        onClick={onStart}
-        className="bg-gradient-to-r from-primary-pink to-pink-500 text-white text-2xl font-bold px-12 py-5 rounded-full shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200 hover:-translate-y-1"
-      >
-        게임 시작하기 🚀
-      </button>
+      <div className="flex flex-col md:flex-row gap-4 justify-center mb-8">
+        <button
+          onClick={() => {
+            if (!user) {
+              alert('게임을 시작하려면 먼저 로그인해주세요!')
+              setShowLogin(true)
+              return
+            }
+            onStart()
+          }}
+          className="bg-gradient-to-r from-primary-pink to-pink-500 text-white text-2xl font-bold px-12 py-5 rounded-full shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200 hover:-translate-y-1"
+        >
+          게임 시작하기 🚀
+        </button>
+        <button
+          onClick={onAdmin}
+          className="bg-gradient-to-r from-primary-blue to-blue-500 text-white text-xl font-bold px-8 py-5 rounded-full shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200 hover:-translate-y-1"
+        >
+          관리자 페이지 👨‍💼
+        </button>
+      </div>
+
+      <div className="mt-12 pt-6 border-t border-gray-200">
+        <p className="text-gray-500 text-sm">made by 케이티조아</p>
+      </div>
     </div>
   )
 }

@@ -5,6 +5,7 @@ import ClassifyScreen from './components/ClassifyScreen'
 import CompareScreen from './components/CompareScreen'
 import ResultScreen from './components/ResultScreen'
 import ResponseReviewScreen from './components/ResponseReviewScreen'
+import AdminScreen from './components/AdminScreen'
 
 function App() {
   const [currentScreen, setCurrentScreen] = useState('main')
@@ -28,7 +29,13 @@ function App() {
       <div className="min-h-screen bg-gradient-to-br from-pastel-pink to-pastel-blue flex items-center justify-center p-5">
         <div className="bg-white rounded-3xl shadow-2xl p-10 max-w-5xl w-full">
           {currentScreen === 'main' && (
-            <MainScreen onStart={() => navigateTo('classify')} />
+            <MainScreen 
+              onStart={() => navigateTo('classify')}
+              onAdmin={() => navigateTo('admin')}
+            />
+          )}
+          {currentScreen === 'admin' && (
+            <AdminScreen onBack={() => navigateTo('main')} />
           )}
           {currentScreen === 'classify' && (
             <ClassifyScreen
